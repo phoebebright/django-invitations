@@ -2,6 +2,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.http import Http404, HttpResponse
@@ -10,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, View
 from django.views.generic.detail import SingleObjectMixin
+
 
 from .adapters import get_invitations_adapter
 from .app_settings import app_settings
@@ -109,6 +111,10 @@ class AcceptInvite(SingleObjectMixin, View):
             raise Http404()
 
     def post(self, *args, **kwargs):
+        
+        # logout any logged in user
+        logout(self.request)
+        
         self.object = invitation = self.get_object()
 
         # Compatibility with older versions: return an HTTP 410 GONE if there
